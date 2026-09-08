@@ -1,4 +1,4 @@
-package edu.produtos.demo;
+package br.edu.ial.produtosapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
