@@ -27,11 +27,13 @@ public class ProdutoService {
         Produto produto = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Produto nao encontrado com id: " + id));
+       
         return toDTO(produto);
     }
 
     public ProdutoDTO criar(ProdutoDTO dto) {
         Produto produto = new Produto(dto.nome(), dto.descricao(), dto.preco(), dto.estoque());
+        
         return toDTO(repository.save(produto));
     }
 
@@ -39,10 +41,12 @@ public class ProdutoService {
         Produto produto = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Produto nao encontrado com id: " + id));
+        
         produto.setNome(dto.nome());
         produto.setDescricao(dto.descricao());
         produto.setPreco(dto.preco());
         produto.setEstoque(dto.estoque());
+        
         return toDTO(repository.save(produto));
     }
 

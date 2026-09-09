@@ -16,22 +16,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
         Map<String, Object> body = new HashMap<>();
+      
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.NOT_FOUND.value());
         body.put("erro", "Recurso nao encontrado");
         body.put("mensagem", ex.getMessage());
+      
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, Object> erros = new HashMap<>();
+      
         ex.getBindingResult().getFieldErrors().forEach(err ->
                 erros.put(err.getField(), err.getDefaultMessage()));
+      
         Map<String, Object> body = new HashMap<>();
+      
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
         body.put("erro", "Erro de validacao");
+       
         body.put("campos", erros);
         return ResponseEntity.badRequest().body(body);
     }
