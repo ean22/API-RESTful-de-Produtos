@@ -6,7 +6,10 @@ import br.edu.ial.produtosapi.model.Produto;
 import br.edu.ial.produtosapi.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +35,12 @@ public class ProdutoService {
     }
 
     public ProdutoDTO criar(ProdutoDTO dto) {
-        Produto produto = new Produto(dto.nome(), dto.descricao(), dto.preco(), dto.estoque());
+        Produto produto = new Produto(
+            dto.nome(), 
+            dto.descricao(), 
+            dto.preco(), 
+            dto.estoque()
+        );
         
         return toDTO(repository.save(produto));
     }
@@ -58,6 +66,32 @@ public class ProdutoService {
     }
 
     private ProdutoDTO toDTO(Produto produto) {
-        return new ProdutoDTO(produto.getId(), produto.getNome(), produto.getDescricao(), produto.getPreco(), produto.getEstoque());
+        return new ProdutoDTO(produto.getId(),
+            produto.getNome(), 
+            produto.getDescricao(), 
+            produto.getPreco(), 
+            produto.getEstoque()
+        );
+    }
+
+    public List<ProdutoDTO> seed() {
+        List<ProdutoDTO> produtos = new ArrayList<>(List.of(
+            new ProdutoDTO(0L,"laranja", "alimento", BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(10.0, 500.0)), ThreadLocalRandom.current().nextInt(1, 101)),
+            new ProdutoDTO(0L,"banana", "alimento", BigDecimal.valueOf(2), ThreadLocalRandom.current().nextInt(1, 101)),
+            new ProdutoDTO(0L,"ovo", "alimento", BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(10.0, 500.0)), ThreadLocalRandom.current().nextInt(1, 101)),
+            new ProdutoDTO(0L,"controle", "eletronico", BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(10.0, 500.0)), ThreadLocalRandom.current().nextInt(1, 101)),
+            new ProdutoDTO(0L,"calça", "vestimenta", BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(10.0, 500.0)), ThreadLocalRandom.current().nextInt(1, 101)),
+            new ProdutoDTO(0L,"camisa", "vestimenta", BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(10.0, 500.0)), ThreadLocalRandom.current().nextInt(1, 101)),
+            new ProdutoDTO(0L,"short", "vestimenta", BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(10.0, 500.0)), ThreadLocalRandom.current().nextInt(1, 101)),
+            new ProdutoDTO(0L,"tenis", "vestimenta", BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(10.0, 500.0)), ThreadLocalRandom.current().nextInt(1, 101)),
+            new ProdutoDTO(0L,"cardarço", "vestimenta", BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(10.0, 500.0)), ThreadLocalRandom.current().nextInt(1, 101)),
+            new ProdutoDTO(0L,"achocolatado", "alimento", BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(10.0, 500.0)), ThreadLocalRandom.current().nextInt(1, 101))
+        ));
+
+        List<ProdutoDTO> produtosSalvos = new ArrayList<>();
+        
+        produtos.forEach(p -> produtosSalvos.add(criar(p)));
+
+        return produtosSalvos;
     }
 }
