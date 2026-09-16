@@ -4,6 +4,7 @@ import br.edu.ial.produtosapi.dto.ProdutoDTO;
 import br.edu.ial.produtosapi.service.ProdutoService;
 import jakarta.validation.Valid;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -11,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -24,29 +24,82 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProdutoDTO>> listar() {
-        return ResponseEntity.ok(service.listarTodos());
+    public ResponseEntity<CollectionModel<EntityModel<ProdutoDTO>>> listar() {
+        List<ProdutoDTO> produtos = service.listarTodos();
+        
+        List<EntityModel<ProdutoDTO>> produtosEntity = 
+            produtos.stream().map(produto -> EntityModel.of(
+                produto, 
+                linkTo(methodOn(
+                    ProdutoController.class)
+                    .buscar(produto.id()))
+                    .withSelfRel()
+                )).toList();
+
+        CollectionModel<EntityModel<ProdutoDTO>> colecao = CollectionModel.of(produtosEntity);
+
+        colecao.add(linkTo(methodOn(ProdutoController.class).listar()).withSelfRel());
+
+        return ResponseEntity.ok(colecao);
     }
 
     @GetMapping("/{id}")
-    public EntityModel<ProdutoDTO> buscar(@PathVariable Long id) {
+    public ResponseEntity<EntityModel<ProdutoDTO>> buscar(@PathVariable Long id) {
         ProdutoDTO produto = service.buscarPorId(id);
         
-        return EntityModel.of(
-            produto,
-            linkTo(methodOn(ProdutoController.class).buscar(id)).withSelfRel()
-        );
+        EntityModel<ProdutoDTO> produtoEntity = EntityModel.of(
+            produto, 
+           
+            linkTo(methodOn(ProdutoController.class)
+                .buscar(id))
+                .withSelfRel(),
+
+           
+            linkTo(methodOn(ProdutoController.class)
+                .remover(id))
+                .withRel("deletar"),
+
+         
+            linkTo(methodOn(ProdutoController.class)
+                .atualizar(id, null))
+                .withRel("atualizar"),
+
+            linkTo(methodOn(ProdutoController.class)
+                .listar())
+                .withRel("produtos")
+              
+            );
+
+        return  ResponseEntity
+            .status(HttpStatus.OK)
+            .body(produtoEntity);
     }
 
     @PostMapping
-    public ResponseEntity<ProdutoDTO> criar (@Valid @RequestBody ProdutoDTO dto) {
-        ProdutoDTO criado = service.criar(dto);
-        return ResponseEntity.created(URI.create("/api/produtos/" + criado.id())).body(criado);
+    public ResponseEntity<EntityModel<ProdutoDTO>> criar (@Valid @RequestBody ProdutoDTO dto) {
+        ProdutoDTO produto = service.criar(dto);
+
+        EntityModel<ProdutoDTO> produtoEntity = EntityModel.of(
+            produto,
+            linkTo(methodOn(ProdutoController.class).buscar(produto.id())).withSelfRel()
+        );
+        
+
+       return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(produtoEntity);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProdutoDTO> atualizar(@Valid @PathVariable Long id, @RequestBody ProdutoDTO dto) {
-        return ResponseEntity.ok(service.atualizar(id, dto));
+    public ResponseEntity<EntityModel<ProdutoDTO>> atualizar(@Valid @PathVariable Long id, @RequestBody ProdutoDTO dto) {
+        
+        ProdutoDTO produto = service.atualizar(id, dto);
+        EntityModel<ProdutoDTO> produtoEntity = EntityModel.of(
+            produto,
+            linkTo(methodOn(ProdutoController.class).buscar(id)).withSelfRel()
+        );
+        
+        return ResponseEntity.ok(produtoEntity);
     }
 
     @DeleteMapping("/{id}")
@@ -57,8 +110,6 @@ public class ProdutoController {
 
     @PostMapping ("/seed")
     public ResponseEntity<List<ProdutoDTO>> seed() {
-        List<ProdutoDTO> produtos = service.seed();
-
-        return ResponseEntity.created(produtos);
+        return ResponseEntity.ok(service.seed());
     }
 }
