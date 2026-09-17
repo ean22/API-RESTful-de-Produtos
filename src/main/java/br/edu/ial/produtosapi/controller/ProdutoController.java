@@ -91,7 +91,7 @@ public class ProdutoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<ProdutoDTO>> atualizar(@Valid @PathVariable Long id, @RequestBody ProdutoDTO dto) {
+    public ResponseEntity<EntityModel<ProdutoDTO>> atualizar(@PathVariable Long id, @Valid @RequestBody ProdutoDTO dto) {
         
         ProdutoDTO produto = service.atualizar(id, dto);
         EntityModel<ProdutoDTO> produtoEntity = EntityModel.of(
