@@ -1,6 +1,7 @@
 package br.edu.ial.produtosapi.controller;
 
-import br.edu.ial.produtosapi.dto.UsuarioDTO;
+import br.edu.ial.produtosapi.dto.UsuarioRequisicaoDTO;
+import br.edu.ial.produtosapi.dto.UsuarioRespostaDTO;
 import br.edu.ial.produtosapi.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.CollectionModel;
@@ -23,10 +24,10 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<UsuarioDTO>>> listar() {
-        List<UsuarioDTO> usuarios = service.listarTodos();
+    public ResponseEntity<CollectionModel<EntityModel<UsuarioRespostaDTO>>> listar() {
+        List<UsuarioRespostaDTO> usuarios = service.listarTodos();
 
-        List<EntityModel<UsuarioDTO>> usuariosEntity =
+        List<EntityModel<UsuarioRespostaDTO>> usuariosEntity =
             usuarios.stream().map(usuario -> EntityModel.of(
                 usuario,
                 linkTo(methodOn(
@@ -35,7 +36,7 @@ public class UsuarioController {
                     .withSelfRel()
                 )).toList();
 
-        CollectionModel<EntityModel<UsuarioDTO>> colecao = CollectionModel.of(usuariosEntity);
+        CollectionModel<EntityModel<UsuarioRespostaDTO>> colecao = CollectionModel.of(usuariosEntity);
 
         colecao.add(linkTo(methodOn(UsuarioController.class).listar()).withSelfRel());
 
@@ -43,10 +44,10 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<UsuarioDTO>> buscar(@PathVariable Long id) {
-        UsuarioDTO usuario = service.buscarPorId(id);
+    public ResponseEntity<EntityModel<UsuarioRespostaDTO>> buscar(@PathVariable Long id) {
+        UsuarioRespostaDTO usuario = service.buscarPorId(id);
 
-        EntityModel<UsuarioDTO> usuarioEntity = EntityModel.of(
+        EntityModel<UsuarioRespostaDTO> usuarioEntity = EntityModel.of(
             usuario,
 
             linkTo(methodOn(UsuarioController.class)
@@ -72,10 +73,10 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<EntityModel<UsuarioDTO>> criar(@Valid @RequestBody UsuarioDTO dto) {
-        UsuarioDTO usuario = service.criar(dto);
+    public ResponseEntity<EntityModel<UsuarioRespostaDTO>> criar(@Valid @RequestBody UsuarioRequisicaoDTO dto) {
+        UsuarioRespostaDTO usuario = service.criar(dto);
 
-        EntityModel<UsuarioDTO> usuarioEntity = EntityModel.of(
+        EntityModel<UsuarioRespostaDTO> usuarioEntity = EntityModel.of(
             usuario,
             linkTo(methodOn(UsuarioController.class).buscar(usuario.id())).withSelfRel()
         );
@@ -86,9 +87,9 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<UsuarioDTO>> atualizar(@PathVariable Long id, @Valid @RequestBody UsuarioDTO dto) {
-        UsuarioDTO usuario = service.atualizar(id, dto);
-        EntityModel<UsuarioDTO> usuarioEntity = EntityModel.of(
+    public ResponseEntity<EntityModel<UsuarioRespostaDTO>> atualizar(@PathVariable Long id, @Valid @RequestBody UsuarioRequisicaoDTO dto) {
+        UsuarioRespostaDTO usuario = service.atualizar(id, dto);
+        EntityModel<UsuarioRespostaDTO> usuarioEntity = EntityModel.of(
             usuario,
             linkTo(methodOn(UsuarioController.class).buscar(id)).withSelfRel()
         );

@@ -1,6 +1,7 @@
 package br.edu.ial.produtosapi.service;
 
-import br.edu.ial.produtosapi.dto.UsuarioDTO;
+import br.edu.ial.produtosapi.dto.UsuarioRequisicaoDTO;
+import br.edu.ial.produtosapi.dto.UsuarioRespostaDTO;
 import br.edu.ial.produtosapi.exception.ResourceNotFoundException;
 import br.edu.ial.produtosapi.model.Usuario;
 import br.edu.ial.produtosapi.repository.UsuarioRepository;
@@ -20,13 +21,13 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<UsuarioDTO> listarTodos() {
+    public List<UsuarioRespostaDTO> listarTodos() {
         return repository.findAll().stream()
                 .map(this::converterParaDTO)
                 .collect(Collectors.toList());
     }
 
-    public UsuarioDTO buscarPorId(Long id) {
+    public UsuarioRespostaDTO buscarPorId(Long id) {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Usuario nao encontrado com id: " + id));
@@ -34,7 +35,7 @@ public class UsuarioService {
         return converterParaDTO(usuario);
     }
 
-    public UsuarioDTO criar(UsuarioDTO dto) {
+    public UsuarioRespostaDTO criar(UsuarioRequisicaoDTO dto) {
         String senhaCriptografada = passwordEncoder.encode(dto.senha());
         Usuario usuario = new Usuario(
             dto.nome(),
@@ -45,7 +46,7 @@ public class UsuarioService {
         return converterParaDTO(repository.save(usuario));
     }
 
-    public UsuarioDTO atualizar(Long id, UsuarioDTO dto) {
+    public UsuarioRespostaDTO atualizar(Long id, UsuarioRequisicaoDTO dto) {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Usuario nao encontrado com id: " + id));
@@ -68,11 +69,10 @@ public class UsuarioService {
         repository.deleteById(id);
     }
 
-    private UsuarioDTO converterParaDTO(Usuario usuario) {
-        return new UsuarioDTO(
+    private UsuarioRespostaDTO converterParaDTO(Usuario usuario) {
+        return new UsuarioRespostaDTO(
             usuario.getId(),
             usuario.getNome(),
-            usuario.getSenha(),
             usuario.getRole()
         );
     }
