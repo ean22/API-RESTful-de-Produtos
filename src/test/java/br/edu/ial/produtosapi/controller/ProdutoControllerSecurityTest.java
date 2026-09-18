@@ -41,6 +41,9 @@ public class ProdutoControllerSecurityTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private br.edu.ial.produtosapi.service.ServicoRateLimit servicoRateLimit;
+
     private final ObjectMapper objectMapper = new ObjectMapper()
             .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -53,11 +56,13 @@ public class ProdutoControllerSecurityTest {
 
         produtoRepository.deleteAll();
         usuarioRepository.deleteAll();
+        servicoRateLimit.limparBaldes();
 
         // Cadastra um usuario ADM e um usuario USER no banco de dados
         usuarioRepository.save(new Usuario("admin", passwordEncoder.encode("admin123"), RoleUsuario.ADM));
         usuarioRepository.save(new Usuario("comum", passwordEncoder.encode("user123"), RoleUsuario.USER));
     }
+
 
     @Test
     void devePermitirListarEBuscarProdutosParaQualquerUsuario() throws Exception {
