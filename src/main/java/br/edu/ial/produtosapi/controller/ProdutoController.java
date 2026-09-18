@@ -10,6 +10,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -70,29 +71,29 @@ public class ProdutoController {
               
             );
 
-        return  ResponseEntity
+        return ResponseEntity
             .status(HttpStatus.OK)
             .body(produtoEntity);
     }
 
+    @PreAuthorize("hasRole('ADM')")
     @PostMapping
-    public ResponseEntity<EntityModel<ProdutoDTO>> criar (@Valid @RequestBody ProdutoDTO dto) {
+    public ResponseEntity<EntityModel<ProdutoDTO>> criar(@Valid @RequestBody ProdutoDTO dto) {
         ProdutoDTO produto = service.criar(dto);
 
         EntityModel<ProdutoDTO> produtoEntity = EntityModel.of(
             produto,
             linkTo(methodOn(ProdutoController.class).buscar(produto.id())).withSelfRel()
         );
-        
 
-       return ResponseEntity
+        return ResponseEntity
             .status(HttpStatus.OK)
             .body(produtoEntity);
     }
 
+    @PreAuthorize("hasRole('ADM')")
     @PutMapping("/{id}")
     public ResponseEntity<EntityModel<ProdutoDTO>> atualizar(@PathVariable Long id, @Valid @RequestBody ProdutoDTO dto) {
-        
         ProdutoDTO produto = service.atualizar(id, dto);
         EntityModel<ProdutoDTO> produtoEntity = EntityModel.of(
             produto,
@@ -102,13 +103,14 @@ public class ProdutoController {
         return ResponseEntity.ok(produtoEntity);
     }
 
+    @PreAuthorize("hasRole('ADM')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remover(@PathVariable Long id) {
         service.remover(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping ("/seed")
+    @PostMapping("/seed")
     public ResponseEntity<List<ProdutoDTO>> seed() {
         return ResponseEntity.ok(service.seed());
     }

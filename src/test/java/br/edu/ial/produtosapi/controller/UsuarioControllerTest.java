@@ -39,9 +39,13 @@ public class UsuarioControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity())
+                .build();
         usuarioRepository.deleteAll();
     }
+
 
     @Test
     void deveCriarUsuarioComSenhaCriptografadaEComRoleAdmSemRetornarSenhaNaResponse() throws Exception {
